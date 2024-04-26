@@ -38,10 +38,44 @@ class LeafNode(HTMLNode):
         return result
 
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag=None, children=None, props=None):
+        super().__init__(tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError('ParentNode requires a tag')
+        if self.children is None:
+            raise ValueError('ParentNode requires children')
+        
+        # Build opening tag
+        result = f"<{self.tag}"
+        if self.props:
+            result += self.props_to_html()
+        result += ">"
+
+        # Add children recursively
+        for child in self.children:
+            result += child.to_html()
+        
+        return result + f"</{self.tag}>"
+
 
 if __name__ == "__main__":
-    node = HTMLNode(tag="a", value="a simple link", props={"href": "https://www.google.com", "target": "_blank"})
-    print(node.props_to_html())
+    # node = HTMLNode(tag="a", value="a simple link", props={"href": "https://www.google.com", "target": "_blank"})
+    # print(node.props_to_html())
     
-    leaf_node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
-    print(leaf_node.to_html())
+    # leaf_node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
+    # print(leaf_node.to_html())
+
+    node = ParentNode(
+        "p",
+        [
+            LeafNode("b", "Bold text"),
+            LeafNode(None, "Normal text"),
+            LeafNode("i", "italic text"),
+            LeafNode(None, "Normal text"),
+        ],
+    )
+
+    print(node.to_html())
